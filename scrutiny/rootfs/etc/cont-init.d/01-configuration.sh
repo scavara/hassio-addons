@@ -56,3 +56,20 @@ case "$FREQUENCY" in
         sed -i "1a export COLLECTOR_CRON_SCHEDULE=\"0 0 * * 0\"" /etc/cont-init.d/50-cron-config
         ;;
 esac
+
+############################
+# SMARTCTL COMMAND OPTIONS #
+############################
+
+# Alignt with smartctl_commands options
+if bashio::config.has_value "SMARTCTL_COMMANDS"; then
+    device_type="$(bashio::config 'SMARTCTL_COMMAND')"
+    cat << EOF > /opt/scrutiny/config/collector.yaml
+    commands:
+      metrics_smartctl_bin: '/usr/sbin/smartctl'
+      metrics_scan_args: '--scan --json --dev ${device_type}'
+      metrics_info_args: '--info --json --dev ${device_type}'
+      metrics_smart_args: '--xall --json --dev ${device_type}'
+    EOF
+fi
+
